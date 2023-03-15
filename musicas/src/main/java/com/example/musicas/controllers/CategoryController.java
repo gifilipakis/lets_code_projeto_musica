@@ -1,11 +1,10 @@
 package com.example.musicas.controllers;
 
 import com.example.musicas.dto.FactoryDTO;
-import com.example.musicas.dto.MusicDTO;
-import com.example.musicas.models.Music;
-import com.example.musicas.repositories.CategoryRepository;
+import com.example.musicas.dto.CategoryDTO;
+import com.example.musicas.models.Category;
 import com.example.musicas.services.CategoryService;
-import com.example.musicas.services.MusicService;
+import com.example.musicas.services.CategoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
@@ -14,41 +13,39 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/music")
+@RequestMapping("/category")
 @AllArgsConstructor
-public class MusicController {
+public class CategoryController {
 
-    private MusicService musicService;
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     @GetMapping("/{uid}")
     public ResponseEntity findByUid(@PathVariable(value = "uid") String uid) {
         try {
-            return ResponseEntity.ok(FactoryDTO.entityToDto(musicService.findByUid(uid)));
+            return ResponseEntity.ok(FactoryDTO.entityToDto(categoryService.findByUid(uid)));
         } catch (ChangeSetPersister.NotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody MusicDTO musicDTO) throws ChangeSetPersister.NotFoundException {
-        musicDTO.setUid(UUID.randomUUID().toString());
-        Music music = FactoryDTO.dtoToEntity(musicDTO);
+    public ResponseEntity create(@RequestBody CategoryDTO categoryDTO) {
+        categoryDTO.setUid(UUID.randomUUID().toString());
+        Category category = FactoryDTO.dtoToEntity(categoryDTO);
         try {
-            musicService.create(music);
-            return ResponseEntity.ok(musicDTO);
+            categoryService.create(category);
+            return ResponseEntity.ok(categoryDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody MusicDTO musicDTO) throws ChangeSetPersister.NotFoundException {
-        Music music = FactoryDTO.dtoToEntity(musicDTO);
+    public ResponseEntity update(@RequestBody CategoryDTO categoryDTO) {
+        Category category = FactoryDTO.dtoToEntity(categoryDTO);
         try {
-            musicService.update(music);
-            return ResponseEntity.ok(FactoryDTO.entityToDto(music));
+            categoryService.update(category);
+            return ResponseEntity.ok(FactoryDTO.entityToDto(category));
         } catch (ChangeSetPersister.NotFoundException e) {
             return ResponseEntity.notFound().build();
         }
@@ -57,7 +54,7 @@ public class MusicController {
     @DeleteMapping("/{uid}")
     public ResponseEntity delete(@PathVariable(value = "uid") String uid) {
         try {
-            musicService.delete(uid);
+            categoryService.delete(uid);
             return ResponseEntity.ok().build();
         } catch (ChangeSetPersister.NotFoundException e) {
             return ResponseEntity.notFound().build();

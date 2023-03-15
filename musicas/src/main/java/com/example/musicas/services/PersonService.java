@@ -1,19 +1,20 @@
 package com.example.musicas.services;
 
+import com.example.musicas.models.Music;
 import com.example.musicas.models.Person;
 import com.example.musicas.repositories.PersonRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.UUID;
+import java.util.function.Predicate;
 
 @Service
 @AllArgsConstructor
 public class PersonService {
 
     private PersonRepository personRepository;
+    private MusicService musicService;
 
     public void create(Person person) {
         personRepository.saveAndFlush(person);
@@ -35,5 +36,31 @@ public class PersonService {
     public void delete(String uid) throws ChangeSetPersister.NotFoundException {
         Person person = findByUid(uid);
         personRepository.delete(person);
+    }
+
+    public void addLikedMusic(String uid, Music music) throws ChangeSetPersister.NotFoundException {
+        Person person = findByUid(uid);
+        if(!checkIfMusicLiked(person, music)) {
+            musicService.like(music);
+            person.addLikedMusic(musicService.update(music));
+            update(person);
+        }
+    }
+
+    public void removeLikedMusic(String uid, Music music) throws ChangeSetPersister.NotFoundException {
+        Person person = findByUid(uid);
+        musicService.dislike(music);
+        person.removeLikedMusic(musicService.update(music));
+        update(person);
+    }
+
+    public boolean checkIfMusicLiked(Person person, Music music) {
+        Predicate<Music> checkLiked = m -> m.getUid().equals(music.getUid());
+        for(Music m : person.getLikedMusicCollection()) {
+            if(checkLiked.test(m)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

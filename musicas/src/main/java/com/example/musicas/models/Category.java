@@ -3,7 +3,7 @@ package com.example.musicas.models;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table
@@ -12,7 +12,10 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private UUID uid;
+    private String uid;
     private String name;
+
+    @OneToMany(mappedBy = "category")
+    private Collection<Music> musicCollection = new ArrayList<>();
 
 }

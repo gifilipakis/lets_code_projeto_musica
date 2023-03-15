@@ -10,7 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 public class MusicDTO {
-    private UUID uid;
+    private String uid;
     private String name;
     private String author;
     private int likes;

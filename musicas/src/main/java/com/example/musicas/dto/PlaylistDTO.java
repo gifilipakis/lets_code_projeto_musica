@@ -11,7 +11,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 public class PlaylistDTO {
-    private UUID uid;
+    private String uid;
     private PersonDTO owner;
-    private Set musicSet;
 }
